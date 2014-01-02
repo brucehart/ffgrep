@@ -17,13 +17,14 @@ Python 3 specific issues.
 Basic Usage
 ===========
 
-Search for "Search term" in the directory /path/to/search:
+Search for `"Search term"` in the directory `/path/to/search`:
 
 ```bash
 python ffgrep.py "Search term" /path/to/search
 ```
 
-Perform a case-insensitive search for "SEARCH TERM" in path /path/to/search and files /path2/file1.txt /path2/file2.txt:
+Perform a case-insensitive search for `"SEARCH TERM"` in path `/path/to/search` and files `/path2/file1.txt` and
+`/path2/file2.txt`:
 
 ```bash
 python ffgrep.py -i "SEARCH TERM" /path/to/search /path2/file1.txt /path2/file2.txt
