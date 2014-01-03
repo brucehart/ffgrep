@@ -31,12 +31,21 @@ def get_files(path, include_subs=True):
     return file_list
 
 def find_matching_lines(filepath, search_term, ignore_case=False):
-    return None
+    f = open(filepath)
+    data = f.readlines()
+
+    if (ignore_case):
+        matches  = [(num+1,line) for num,line in enumerate(data) if line.lower().find(search_term.lower()) >= 0]
+    else:
+        matches  = [(num+1,line) for num,line in enumerate(data) if line.find(search_term) >= 0]
+
+    f.close()
+    return matches
+
 
 if __name__ == '__main__':
     parser = setup_parser()
     parser.set_defaults()
     args = parser.parse_args()
 
-
-    print get_files("C:\\Users\\Bruce\\workspace\\ffgrep")
+    print find_matching_lines("ffgrep.py", args.pattern, True)
