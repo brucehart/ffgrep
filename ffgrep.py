@@ -50,9 +50,11 @@ if __name__ == '__main__':
 
     search_matches = []
 
-    match_set = map(lambda x: find_matching_lines(x, args.pattern, True), args.paths)
+    for path in args.paths:
+        match_set = map(lambda x: find_matching_lines(x, args.pattern, True), get_files(path))
 
-    for match in match_set:
-        map(lambda x: search_matches.append(x),match)
+        for match in match_set:
+            map(lambda x: search_matches.append(x),match)
+
 
     print search_matches
