@@ -35,9 +35,9 @@ def find_matching_lines(filepath, search_term, ignore_case=False):
     data = f.readlines()
 
     if (ignore_case):
-        matches  = [(num+1,line) for num,line in enumerate(data) if line.lower().find(search_term.lower()) >= 0]
+        matches  = [(num+1,line,filepath) for num,line in enumerate(data) if line.lower().find(search_term.lower()) >= 0]
     else:
-        matches  = [(num+1,line) for num,line in enumerate(data) if line.find(search_term) >= 0]
+        matches  = [(num+1,line,filepath) for num,line in enumerate(data) if line.find(search_term) >= 0]
 
     f.close()
     return matches
@@ -48,4 +48,11 @@ if __name__ == '__main__':
     parser.set_defaults()
     args = parser.parse_args()
 
-    print find_matching_lines("ffgrep.py", args.pattern, True)
+    search_matches = []
+
+    match_set = map(lambda x: find_matching_lines(x, args.pattern, True), args.paths)
+
+    for match in match_set:
+        map(lambda x: search_matches.append(x),match)
+
+    print search_matches
