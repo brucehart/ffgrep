@@ -1,7 +1,7 @@
 import argparse
 import os
 
-def setup_parser():
+def setup_arg_parser():
     parser = argparse.ArgumentParser(description="Search for a string in the specified file or path.")
 
     parser.add_argument('pattern', metavar='S', type=str,
@@ -35,16 +35,16 @@ def find_matching_lines(filepath, search_term, ignore_case=False):
     data = f.readlines()
 
     if (ignore_case):
-        matches  = [(num+1,line,filepath) for num,line in enumerate(data) if line.lower().find(search_term.lower()) >= 0]
+        matches  = [(num+1,line.strip(),filepath) for num,line in enumerate(data) if line.lower().find(search_term.lower()) >= 0]
     else:
-        matches  = [(num+1,line,filepath) for num,line in enumerate(data) if line.find(search_term) >= 0]
+        matches  = [(num+1,line.strip(),filepath) for num,line in enumerate(data) if line.find(search_term) >= 0]
 
     f.close()
     return matches
 
 
 if __name__ == '__main__':
-    parser = setup_parser()
+    parser = setup_arg_parser()
     parser.set_defaults()
     args = parser.parse_args()
 
@@ -62,5 +62,5 @@ if __name__ == '__main__':
         for match in match_set:
             map(lambda x: search_matches.append(x),match)
 
-
-    print search_matches
+    for line_match in search_matches:
+        print "{0}[{1}]: {2}".format(line_match[2], line_match[0], line_match[1])
