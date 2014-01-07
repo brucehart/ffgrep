@@ -62,5 +62,9 @@ if __name__ == '__main__':
         for match in match_set:
             map(lambda x: search_matches.append(x),match)
 
-    for line_match in search_matches:
-        print "{0}[{1}]: {2}".format(line_match[2], line_match[0], line_match[1])
+    for (num,line_match) in enumerate(search_matches):
+        filename = line_match[2]
+        if ("\\" in filename):
+            filename = filename.split("\\")[-1]
+
+        print "{3} : {0}[{1}]: {2}".format(filename, line_match[0], line_match[1], num)
