@@ -1,5 +1,7 @@
+#ffgrep - A Python-based file search utility
 import argparse
 import os
+import sys
 
 def setup_arg_parser():
     parser = argparse.ArgumentParser(description="Search for a string in the specified file or path.")
@@ -68,3 +70,11 @@ if __name__ == '__main__':
             filename = filename.split("\\")[-1]
 
         print "{3} : {0}[{1}]: {2}".format(filename, line_match[0], line_match[1], num)
+
+    openLine = sys.stdin.readline()
+
+    viewLine = int(openLine)
+
+    if (viewLine > 0 and viewLine <= len(search_matches)):
+        os.system("\"C:\\Program Files (x86)\\Notepad++\\notepad++.exe\" {0} -n{1}".format(search_matches[viewLine-1][2],search_matches[viewLine-1][0]))
+
