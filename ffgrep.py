@@ -3,6 +3,8 @@ import argparse
 import os
 import sys
 
+items_per_page = 10
+
 def setup_arg_parser():
     parser = argparse.ArgumentParser(description="Search for a string in the specified file or path.")
 
@@ -44,6 +46,13 @@ def find_matching_lines(filepath, search_term, ignore_case=False):
     f.close()
     return matches
 
+def print_results(results, start_line=1):
+    for (num,line_match) in enumerate(results,start_line):
+        filename = line_match[2]
+        if ("\\" in filename):
+            filename = filename.split("\\")[-1]
+
+        print "{3} : {0}[{1}]: {2}".format(filename, line_match[0], line_match[1], num)
 
 if __name__ == '__main__':
     parser = setup_arg_parser()
@@ -64,17 +73,23 @@ if __name__ == '__main__':
         for match in match_set:
             map(lambda x: search_matches.append(x),match)
 
-    for (num,line_match) in enumerate(search_matches):
-        filename = line_match[2]
-        if ("\\" in filename):
-            filename = filename.split("\\")[-1]
+    current_page = 0
+    print_results(search_matches[0:min(items_per_page, len(search_matches))], 1)
 
-        print "{3} : {0}[{1}]: {2}".format(filename, line_match[0], line_match[1], num)
+    while(True):
+        openLine = sys.stdin.readline()
 
-    openLine = sys.stdin.readline()
+        if (openLine[0] == "n" or openLine[0] == "N"):
+            current_page += 1
+            if (len(search_matches) > current_page*items_per_page):
+               print_results(search_matches[current_page*items_per_page:min((current_page+1)*items_per_page,len(search_matches))],current_page*items_per_page+1)
+            else:
+                exit()
+        elif (openLine[0] == "x" or openLine[0] == "X"):
+            exit()
+        else:
+            viewLine = int(openLine)
 
-    viewLine = int(openLine)
-
-    if (viewLine > 0 and viewLine <= len(search_matches)):
-        os.system("\"C:\\Program Files (x86)\\Notepad++\\notepad++.exe\" {0} -n{1}".format(search_matches[viewLine-1][2],search_matches[viewLine-1][0]))
+            if (viewLine > 0 and viewLine <= len(search_matches)):
+                os.system("\"C:\\Program Files (x86)\\Notepad++\\notepad++.exe\" {0} -n{1}".format(search_matches[viewLine-1][2],search_matches[viewLine-1][0]))
 
