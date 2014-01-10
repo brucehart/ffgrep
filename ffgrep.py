@@ -4,6 +4,7 @@ import os
 import sys
 
 items_per_page = 10
+line_length = 50
 
 def setup_arg_parser():
     parser = argparse.ArgumentParser(description="Search for a string in the specified file or path.")
@@ -46,13 +47,22 @@ def find_matching_lines(filepath, search_term, ignore_case=False):
     f.close()
     return matches
 
-def print_results(results, start_line=1):
+def print_results(results, search_term, start_line=1):
     for (num,line_match) in enumerate(results,start_line):
         filename = line_match[2]
         if ("\\" in filename):
             filename = filename.split("\\")[-1]
 
-        print "{3} : {0}[{1}]: {2}".format(filename, line_match[0], line_match[1], num)
+        line_data = line_match[1][0:line_length]
+
+        #print line_data
+        #term_idx = line_data.index(search_term)
+
+        #if (len(line_data) > line_length):
+            #need more logic here to center the term
+        #    line_data = line_data[0:line_length]
+
+        print "{3} : {0}[{1}]: {2}".format(filename, line_match[0], line_data, num)
 
 if __name__ == '__main__':
     parser = setup_arg_parser()
@@ -82,7 +92,7 @@ if __name__ == '__main__':
         if (openLine[0] == "n" or openLine[0] == "N"):
             current_page += 1
             if (len(search_matches) > current_page*items_per_page):
-               print_results(search_matches[current_page*items_per_page:min((current_page+1)*items_per_page,len(search_matches))],current_page*items_per_page+1)
+               print_results(search_matches[current_page*items_per_page:min((current_page+1)*items_per_page,len(search_matches))], args.pattern, current_page*items_per_page+1)
             else:
                 exit()
         elif (openLine[0] == "x" or openLine[0] == "X"):
