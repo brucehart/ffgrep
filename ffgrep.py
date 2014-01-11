@@ -1,7 +1,8 @@
 #ffgrep - A Python-based file search utility
 import argparse
-import os
 import sys
+import os
+import subprocess
 
 items_per_page = 10
 line_length = 50
@@ -47,20 +48,33 @@ def find_matching_lines(filepath, search_term, ignore_case=False):
     f.close()
     return matches
 
-def print_results(results, search_term, start_line=1):
+def print_results(results, search_term, start_line=1, ignore_case=True):
     for (num,line_match) in enumerate(results,start_line):
         filename = line_match[2]
         if ("\\" in filename):
             filename = filename.split("\\")[-1]
 
-        line_data = line_match[1][0:line_length]
+        line_data = str(line_match[1]).strip()
 
-        #print line_data
-        #term_idx = line_data.index(search_term)
+        if (ignore_case):
+            item_idx = line_data.lower().find(search_term.lower())
+        else:
+            item_idx = line_data.lower().find(search_term.lower())
 
-        #if (len(line_data) > line_length):
-            #need more logic here to center the term
-        #    line_data = line_data[0:line_length]
+        start_idx = item_idx - (line_length - len(search_term))/2
+        end_idx = item_idx + len(search_term) + (line_length - len(search_term))/2
+
+        if (start_idx < 0):
+            start_idx = 0
+            end_idx = min(line_length, len(line_data))
+        elif (end_idx > len(line_data)):
+            start_idx -= (line_length - len(line_data))
+            end_idx = min(line_length, len(line_data))
+
+        if (start_idx < 0):
+            start_idx = 0
+
+        line_data = line_data[start_idx:end_idx]
 
         print "{3} : {0}[{1}]: {2}".format(filename, line_match[0], line_data, num)
 
@@ -84,7 +98,7 @@ if __name__ == '__main__':
             map(lambda x: search_matches.append(x),match)
 
     current_page = 0
-    print_results(search_matches[0:min(items_per_page, len(search_matches))], 1)
+    print_results(search_matches[0:min(items_per_page, len(search_matches))], args.pattern, 1)
 
     while(True):
         openLine = sys.stdin.readline()
@@ -102,4 +116,5 @@ if __name__ == '__main__':
 
             if (viewLine > 0 and viewLine <= len(search_matches)):
                 os.system("\"C:\\Program Files (x86)\\Notepad++\\notepad++.exe\" {0} -n{1}".format(search_matches[viewLine-1][2],search_matches[viewLine-1][0]))
+
 
