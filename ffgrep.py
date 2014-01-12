@@ -41,7 +41,8 @@ def find_matching_lines(filepath, search_term, ignore_case=False):
     data = f.readlines()
 
     if (ignore_case):
-        matches  = [(num+1,line.strip(),filepath) for num,line in enumerate(data) if line.lower().find(search_term.lower()) >= 0]
+        matches  = [(num+1,line.strip(),filepath) for num,line in enumerate(data) if
+                    line.lower().find(search_term.lower()) >= 0]
     else:
         matches  = [(num+1,line.strip(),filepath) for num,line in enumerate(data) if line.find(search_term) >= 0]
 
@@ -101,20 +102,29 @@ if __name__ == '__main__':
     print_results(search_matches[0:min(items_per_page, len(search_matches))], args.pattern, 1)
 
     while(True):
+        print "Items [{0}:{1} of {2}]. Enter a match number, N for next page or X to exit"\
+            .format(current_page*items_per_page+1,min((current_page+1)*items_per_page,
+                    len(search_matches)),len(search_matches))
+
         openLine = sys.stdin.readline()
 
         if (openLine[0] == "n" or openLine[0] == "N"):
             current_page += 1
             if (len(search_matches) > current_page*items_per_page):
-               print_results(search_matches[current_page*items_per_page:min((current_page+1)*items_per_page,len(search_matches))], args.pattern, current_page*items_per_page+1)
+               print_results(search_matches[current_page*items_per_page:min((current_page+1)*items_per_page,
+                             len(search_matches))], args.pattern, current_page*items_per_page+1)
             else:
                 exit()
         elif (openLine[0] == "x" or openLine[0] == "X"):
             exit()
         else:
-            viewLine = int(openLine)
+            try:
+                viewLine = int(openLine)
+            except:
+                continue
 
             if (viewLine > 0 and viewLine <= len(search_matches)):
-                os.system("\"C:\\Program Files (x86)\\Notepad++\\notepad++.exe\" {0} -n{1}".format(search_matches[viewLine-1][2],search_matches[viewLine-1][0]))
-
+                os.system("\"C:\\Program Files (x86)\\Notepad++\\notepad++.exe\" {0} -n{1}".format(
+                    search_matches[viewLine-1][2],search_matches[viewLine-1][0]))
+                exit()
 
