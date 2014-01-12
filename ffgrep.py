@@ -2,15 +2,17 @@
 import argparse
 import sys
 import os
-import subprocess
 
-items_per_page = 10
-line_length = 50
+DEFAULT_ITEMS_PER_PAGE = 10
+DEFAULT_LINE_LENGTH = 50
+
+items_per_page = DEFAULT_ITEMS_PER_PAGE
+line_length = DEFAULT_LINE_LENGTH
 
 def setup_arg_parser():
     parser = argparse.ArgumentParser(description="Search for a string in the specified file or path.")
 
-    parser.add_argument('pattern', metavar='S', type=str,
+    parser.add_argument('pattern', metavar='pattern', type=str,
                         help='search pattern')
 
     parser.add_argument('paths', default='.', nargs='*',
@@ -21,6 +23,13 @@ def setup_arg_parser():
 
     parser.add_argument('-n','--no-subdir', action='store_const', const=True,
                         help='do not look in sub-directories of the search directories')
+
+    parser.add_argument('-p', '--items_per_page', nargs='?', type=int,
+                        default=DEFAULT_ITEMS_PER_PAGE, help='number of items to list per page')
+
+    parser.add_argument('-l', '--line_length', nargs='?', type=int,
+                        default=DEFAULT_ITEMS_PER_PAGE, help='length of each match result line')
+
     return parser
 
 def get_files(path, include_subs=True):
@@ -83,6 +92,16 @@ if __name__ == '__main__':
     parser = setup_arg_parser()
     parser.set_defaults()
     args = parser.parse_args()
+
+    if (args.items_per_page == None):
+        items_per_page = DEFAULT_ITEMS_PER_PAGE
+    else:
+        items_per_page = int(args.items_per_page)
+
+    if (args.line_length == None):
+        line_length = DEFAULT_LINE_LENGTH
+    else:
+        line_length = int(line_length)
 
     search_matches = []
 
