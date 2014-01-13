@@ -3,7 +3,9 @@ import argparse
 import sys
 import os
 
-DEFAULT_ITEMS_PER_PAGE = 10
+TEXT_EDITOR_COMMAND = "\"C:\\Program Files (x86)\\Notepad++\\notepad++.exe\" {0} -n{1}"
+
+DEFAULT_ITEMS_PER_PAGE = 25
 DEFAULT_LINE_LENGTH = 50
 
 items_per_page = DEFAULT_ITEMS_PER_PAGE
@@ -28,7 +30,7 @@ def setup_arg_parser():
                         default=DEFAULT_ITEMS_PER_PAGE, help='number of items to list per page')
 
     parser.add_argument('-l', '--line_length', nargs='?', type=int,
-                        default=DEFAULT_ITEMS_PER_PAGE, help='length of each match result line')
+                        default=DEFAULT_LINE_LENGTH, help='length of each match result line')
 
     return parser
 
@@ -78,11 +80,8 @@ def print_results(results, search_term, start_line=1, ignore_case=True):
             start_idx = 0
             end_idx = min(line_length, len(line_data))
         elif (end_idx > len(line_data)):
-            start_idx -= (line_length - len(line_data))
+            start_idx -= max(0,(line_length - len(line_data)))
             end_idx = min(line_length, len(line_data))
-
-        if (start_idx < 0):
-            start_idx = 0
 
         line_data = line_data[start_idx:end_idx]
 
@@ -93,20 +92,12 @@ if __name__ == '__main__':
     parser.set_defaults()
     args = parser.parse_args()
 
-    if (args.items_per_page == None):
-        items_per_page = DEFAULT_ITEMS_PER_PAGE
-    else:
-        items_per_page = int(args.items_per_page)
-
-    if (args.line_length == None):
-        line_length = DEFAULT_LINE_LENGTH
-    else:
-        line_length = int(line_length)
+    items_per_page = int(args.items_per_page)
+    line_length = int(args.line_length)
 
     search_matches = []
 
     for path in args.paths:
-        print path
         if (os.path.isfile(path)):
             match_set = [find_matching_lines(path, args.pattern, True)]
         elif (os.path.isdir(path)):
@@ -116,6 +107,10 @@ if __name__ == '__main__':
 
         for match in match_set:
             map(lambda x: search_matches.append(x),match)
+
+    if (len(search_matches) == 0):
+        print "No matches found. Exiting..."
+        exit()
 
     current_page = 0
     print_results(search_matches[0:min(items_per_page, len(search_matches))], args.pattern, 1)
@@ -143,7 +138,7 @@ if __name__ == '__main__':
                 continue
 
             if (viewLine > 0 and viewLine <= len(search_matches)):
-                os.system("\"C:\\Program Files (x86)\\Notepad++\\notepad++.exe\" {0} -n{1}".format(
+                os.system(TEXT_EDITOR_COMMAND.format(
                     search_matches[viewLine-1][2],search_matches[viewLine-1][0]))
                 exit()
 
