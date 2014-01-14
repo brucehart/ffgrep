@@ -3,14 +3,18 @@ import argparse
 import sys
 import os
 
+#command to execute to open a text editor to the matching file and line
+#param {0} is the full file path and {1} is the line number
 TEXT_EDITOR_COMMAND = "\"C:\\Program Files (x86)\\Notepad++\\notepad++.exe\" {0} -n{1}"
 
+#default values for numbered parameters. user can change via command line parameters
 DEFAULT_ITEMS_PER_PAGE = 25
 DEFAULT_LINE_LENGTH = 50
 
 items_per_page = DEFAULT_ITEMS_PER_PAGE
 line_length = DEFAULT_LINE_LENGTH
 
+#set up command line parser using the argparse library
 def setup_arg_parser():
     parser = argparse.ArgumentParser(description="Search for a string in the specified file or path.")
 
@@ -34,9 +38,11 @@ def setup_arg_parser():
 
     return parser
 
+#retrieves a list of files for a given path
 def get_files(path, include_subs=True):
     file_list = []
 
+    #use os.walk if we are including subdirectories, otherwise just traverse the list of files
     if (include_subs):
         for root, dirs, files in os.walk(path):
             for file in files:
@@ -47,32 +53,41 @@ def get_files(path, include_subs=True):
 
     return file_list
 
+#retrieves a list of lines that include the search term
+#results are tuples containing (line number, line text, file path)
 def find_matching_lines(filepath, search_term, ignore_case=False):
     f = open(filepath)
     data = f.readlines()
 
+    #if we are ignoring case, cast the search term and line data into lower case before searching
     if (ignore_case):
-        matches  = [(num+1,line.strip(),filepath) for num,line in enumerate(data) if
+        matches = [(num+1,line.strip(),filepath) for num,line in enumerate(data) if
                     line.lower().find(search_term.lower()) >= 0]
     else:
-        matches  = [(num+1,line.strip(),filepath) for num,line in enumerate(data) if line.find(search_term) >= 0]
+        matches = [(num+1,line.strip(),filepath) for num,line in enumerate(data) if line.find(search_term) >= 0]
 
     f.close()
     return matches
 
+#prints a set of results based on a set of tuple matches
 def print_results(results, search_term, start_line=1, ignore_case=True):
     for (num,line_match) in enumerate(results,start_line):
         filename = line_match[2]
+
+        #the filename is the data after the last "\" in the path
+        #TODO: update this section to support Linux paths
         if ("\\" in filename):
             filename = filename.split("\\")[-1]
 
         line_data = str(line_match[1]).strip()
 
+        #find the location where the search term is first found to display the appropriate line subsection
         if (ignore_case):
             item_idx = line_data.lower().find(search_term.lower())
         else:
             item_idx = line_data.lower().find(search_term.lower())
 
+        #slice the data so the search term is centered on the printed line
         start_idx = item_idx - (line_length - len(search_term))/2
         end_idx = item_idx + len(search_term) + (line_length - len(search_term))/2
 
@@ -87,6 +102,8 @@ def print_results(results, search_term, start_line=1, ignore_case=True):
 
         print "{3} : {0}[{1}]: {2}".format(filename, line_match[0], line_data, num)
 
+#script is intended to be executed interactively from the command line
+#basic usage: python ffgrep.py search_term file_path
 if __name__ == '__main__':
     parser = setup_arg_parser()
     parser.set_defaults()
