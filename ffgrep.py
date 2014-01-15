@@ -75,9 +75,8 @@ def print_results(results, search_term, start_line=1, ignore_case=True):
         filename = line_match[2]
 
         #the filename is the data after the last "\" in the path
-        #TODO: update this section to support Linux paths
-        if ("\\" in filename):
-            filename = filename.split("\\")[-1]
+        if (os.sep in filename):
+            filename = filename.split(os.sep)[-1]
 
         line_data = str(line_match[1]).strip()
 
