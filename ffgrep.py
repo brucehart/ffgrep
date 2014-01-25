@@ -132,7 +132,7 @@ if __name__ == '__main__':
     print_results(search_matches[0:min(items_per_page, len(search_matches))], args.pattern, 1)
 
     while(True):
-        print "Items [{0}:{1} of {2}]. Enter a match number, N for next page or X to exit"\
+        print "Items [{0}:{1} of {2}]. Enter a match number, N for next page, B for back or X to exit"\
             .format(current_page*items_per_page+1,min((current_page+1)*items_per_page,
                     len(search_matches)),len(search_matches))
 
@@ -145,6 +145,12 @@ if __name__ == '__main__':
                              len(search_matches))], args.pattern, current_page*items_per_page+1)
             else:
                 exit()
+        elif (openLine[0] == "b" or openLine[0] == "B"):
+			if (current_page > 0):
+				current_page = current_page - 1			
+				print_results(search_matches[current_page*items_per_page:min((current_page+1)*items_per_page, 
+					len(search_matches))], args.pattern, current_page*items_per_page+1)
+							 
         elif (openLine[0] == "x" or openLine[0] == "X"):
             exit()
         else:
