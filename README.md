@@ -7,7 +7,7 @@ changes.
 
 Status
 ======
-Code is currently under development and not available for use yet.
+Code is functional but not optimized. Searching large directories may be slow until a faster search algorithm is implemented for in-file searching.
 
 Installation and Pre-Requisites
 ===============================
